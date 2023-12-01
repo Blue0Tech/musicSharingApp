@@ -23,14 +23,24 @@ def setup():
 def acceptConnections():
     global SERVER
     global clients
+    global BUFFER_SIZE
 
     while True:
         client,addr = SERVER.accept()
-        print(client,addr)
-        client_thread = Thread(target=clientThread,args=(client,addr))
-        client_thread.start()
+        name = client.recv(BUFFER_SIZE).decode().lower()
+        clients[name] = {
+            'client':client,
+            'address':addr,
+            'connected_with':'',
+            'file_name':'',
+            'file_size':4096
+        }
+        
+        print(f'Connection established with {name} : {addr}')
+        thread = Thread(target=clientThread,args=(client,name))
+        thread.start()
 
-def clientThread(client,addr):
+def clientThread(client,name):
     pass
 
 setup()

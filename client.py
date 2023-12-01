@@ -1,11 +1,21 @@
 import socket
+from threading import Thread
 from tkinter import *
 from tkinter import ttk,filedialog
+from playsound import playsound
+import pygame
+from pygame import mixer
+import os
+import time
 
 PORT = 8050
 IP = '127.0.0.1'
 SERVER = None
 BUFFER_SIZE = 4096
+song_counter = 0
+listbox = None
+infoLabel = None
+selected_song = None
 
 def setup():
     global SERVER
@@ -17,7 +27,35 @@ def setup():
 
     musicWindow()
 
+def play():
+    global selected_song
+    global infoLabel
+    
+    selected_song = listbox.get(ANCHOR)
+
+    pygame
+    mixer.init()
+    mixer.music.load('C:\\Users\\pruth\\Music\\mymusic\\'+selected_song)
+    mixer.music.play()
+    if(selected_song!=''):
+        infoLabel.configure(text='Now playing: '+selected_song)
+    else:
+        infoLabel.configure(text='')
+
+def stop():
+    global selected_song
+    
+    pygame
+    mixer.init()
+    mixer.music.load('C:\\Users\\pruth\\Music\\mymusic\\'+selected_song)
+    mixer.music.pause()
+    infoLabel.configure(text='')
+
 def musicWindow():
+    global listbox
+    global infoLabel
+    global song_counter
+
     window = Tk()
     window.title('Music Window')
     window.geometry('300x300')
@@ -33,10 +71,10 @@ def musicWindow():
     scrollbar1.place(relheight=1,relx=1)
     scrollbar1.config(command=listbox.yview)
 
-    playButton = Button(window,text='Play',width=10,bd=1,bg='SkyBlue',font=('Calibri',10))
+    playButton = Button(window,text='Play',width=10,bd=1,bg='SkyBlue',font=('Calibri',10),command=play)
     playButton.place(x=30,y=200)
 
-    stopButton = Button(window,text='Stop',width=10,bd=1,bg='SkyBlue',font=('Calibri',10))
+    stopButton = Button(window,text='Stop',width=10,bd=1,bg='SkyBlue',font=('Calibri',10),command=stop)
     stopButton.place(x=200,y=200)
 
     uploadButton = Button(window,text='Upload',width=10,bd=1,bg='SkyBlue',font=('Calibri',10))
@@ -48,6 +86,12 @@ def musicWindow():
     infoLabel = Label(window,text='',fg='blue',font=('Calibri',8))
     infoLabel.place(x=4,y=280)
 
+    for file in os.listdir('C:\\Users\\pruth\\Music\\mymusic'):
+        filename = os.fsdecode(file)
+        listbox.insert(song_counter,filename)
+        song_counter += 1
+
     window.mainloop()
 
-setup()
+setup_thread = Thread(target=setup)
+setup_thread.start()
