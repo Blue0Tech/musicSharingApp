@@ -46,10 +46,20 @@ def stop():
     global selected_song
     
     pygame
-    mixer.init()
-    mixer.music.load('C:\\Users\\pruth\\Music\\mymusic\\'+selected_song)
-    mixer.music.pause()
+    mixer.music.stop()
     infoLabel.configure(text='')
+
+def resume():
+    global selected_song
+
+    pygame
+    mixer.music.unpause()
+
+def pause():
+    global selected_song
+    
+    pygame
+    mixer.music.pause()
 
 def musicWindow():
     global listbox
@@ -58,7 +68,7 @@ def musicWindow():
 
     window = Tk()
     window.title('Music Window')
-    window.geometry('300x300')
+    window.geometry('300x350')
     window.configure(bg='LightSkyBlue')
 
     selectLabel = Label(window,text='Select Song',bg='LightSkyBlue',font=('Calibri',8))
@@ -78,13 +88,19 @@ def musicWindow():
     stopButton.place(x=200,y=200)
 
     uploadButton = Button(window,text='Upload',width=10,bd=1,bg='SkyBlue',font=('Calibri',10))
-    uploadButton.place(x=30,y=250)
+    uploadButton.place(x=30,y=300)
 
     downloadButton = Button(window,text='Download',width=10,bd=1,bg='SkyBlue',font=('Calibri',10))
-    downloadButton.place(x=200,y=250)
+    downloadButton.place(x=200,y=300)
+
+    resumeButton = Button(window,text='Resume',width=10,bd=1,bg='SkyBlue',font=('Calibri',10),command=resume)
+    resumeButton.place(x=200,y=250)
+    
+    pauseButton = Button(window,text='Pause',width=10,bd=1,bg='SkyBlue',font=('Calibri',10),command=pause)
+    pauseButton.place(x=30,y=250)
 
     infoLabel = Label(window,text='',fg='blue',font=('Calibri',8))
-    infoLabel.place(x=4,y=280)
+    infoLabel.place(x=4,y=330)
 
     for file in os.listdir('C:\\Users\\pruth\\Music\\mymusic'):
         filename = os.fsdecode(file)
