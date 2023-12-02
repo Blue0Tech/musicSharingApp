@@ -7,6 +7,10 @@ import pygame
 from pygame import mixer
 import os
 import time
+import ftplib
+from ftplib import FTP
+import ntpath
+from pathlib import Path
 
 PORT = 8050
 IP = '127.0.0.1'
@@ -87,7 +91,7 @@ def musicWindow():
     stopButton = Button(window,text='Stop',width=10,bd=1,bg='SkyBlue',font=('Calibri',10),command=stop)
     stopButton.place(x=200,y=200)
 
-    uploadButton = Button(window,text='Upload',width=10,bd=1,bg='SkyBlue',font=('Calibri',10))
+    uploadButton = Button(window,text='Upload',width=10,bd=1,bg='SkyBlue',font=('Calibri',10),command=browseFiles)
     uploadButton.place(x=30,y=300)
 
     downloadButton = Button(window,text='Download',width=10,bd=1,bg='SkyBlue',font=('Calibri',10))
@@ -108,6 +112,26 @@ def musicWindow():
         song_counter += 1
 
     window.mainloop()
+
+def browseFiles():
+    try:
+        filename = filedialog.askopenfilename()
+        host = '127.0.0.1'
+        user = 'ftp'
+        pswd = 'ftp'
+        fname = ntpath.basename(filename)
+
+        ftp_server = FTP(host,user,pswd)
+        ftp_server.encoding = 'utf-8'
+        ftp_server.cwd('shared_files')
+        with open(filename,'rb') as f:
+            ftp_server.storbinary(f'STOR {fname}',f)
+        
+        ftp_server.dir()
+        ftp_server.quit()
+
+    except FileNotFoundError:
+        print('Cancel button pressed')
 
 setup_thread = Thread(target=setup)
 setup_thread.start()
