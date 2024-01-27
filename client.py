@@ -94,7 +94,7 @@ def musicWindow():
     uploadButton = Button(window,text='Upload',width=10,bd=1,bg='SkyBlue',font=('Calibri',10),command=browseFiles)
     uploadButton.place(x=30,y=300)
 
-    downloadButton = Button(window,text='Download',width=10,bd=1,bg='SkyBlue',font=('Calibri',10))
+    downloadButton = Button(window,text='Download',width=10,bd=1,bg='SkyBlue',font=('Calibri',10),command=download)
     downloadButton.place(x=200,y=300)
 
     resumeButton = Button(window,text='Resume',width=10,bd=1,bg='SkyBlue',font=('Calibri',10),command=resume)
@@ -106,7 +106,7 @@ def musicWindow():
     infoLabel = Label(window,text='',fg='blue',font=('Calibri',8))
     infoLabel.place(x=4,y=330)
 
-    for file in os.listdir('C:\\Users\\pruth\\Music\\mymusic'):
+    for file in os.listdir('shared_files'):
         filename = os.fsdecode(file)
         listbox.insert(song_counter,filename)
         song_counter += 1
@@ -114,6 +114,7 @@ def musicWindow():
     window.mainloop()
 
 def browseFiles():
+    global song_counter
     try:
         filename = filedialog.askopenfilename()
         host = '127.0.0.1'
@@ -130,8 +131,36 @@ def browseFiles():
         ftp_server.dir()
         ftp_server.quit()
 
+        listbox.insert(song_counter,fname)
+        song_counter += 1
+
     except FileNotFoundError:
         print('Cancel button pressed')
+
+def download():
+    global selected_song
+    song_to_download = listbox.get(ANCHOR)
+    infoLabel.configure(text="Downloading " + song_to_download)
+    HOSTNAME = '127.0.0.1'
+    USERNAME = 'ftp'
+    PASSWORD = 'ftp'
+    home = str(Path.home())
+    download_path = home+'/Downloads'
+    ftp_server = FTP(HOSTNAME,USERNAME,PASSWORD)
+    ftp_server.encoding = 'utf-8'
+    ftp_server.cwd('shared_files')
+    local_filename = os.path.join(download_path,song_to_download)
+    file = open(local_filename,'wb')
+    ftp_server.retrbinary('RETR '+song_to_download,file.write)
+    ftp_server.dir()
+    file.close()
+    ftp_server.quit()
+    infoLabel.configure(text='Download Complete')
+    time.sleep(1)
+    if(selected_song != '' and selected_song != None):
+        infoLabel.configure(text="Now playing: "+selected_song)
+    else:
+        infoLabel.configure(text='')
 
 setup_thread = Thread(target=setup)
 setup_thread.start()

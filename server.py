@@ -3,6 +3,10 @@ from threading import Thread
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
+import os
+
+if(not os.path.isdir('shared_files')):
+    os.makedirs('shared_files')
 
 IP = '127.0.0.1'
 PORT = 8050
@@ -26,11 +30,10 @@ def setup():
 def acceptConnections():
     global SERVER
     global clients
-    global BUFFER_SIZE
 
     while True:
         client,addr = SERVER.accept()
-        name = client.recv(BUFFER_SIZE).decode().lower()
+        name = client.recv(4096).decode().lower()
         clients[name] = {
             'client':client,
             'address':addr,
